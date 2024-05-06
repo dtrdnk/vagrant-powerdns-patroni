@@ -1,0 +1,17 @@
+---
+keepalived_instances:
+  internal:
+    interface: "eth1"
+    # You can also use your own variable to determine which node is master and who
+    #state: "{{ (groups['all'].index(inventory_hostname) == 0) | ternary('MASTER','BACKUP') }}"
+    state: 'BACKUP'
+    virtual_router_id: 42
+    # I advise you to define your own priority per node, instead of a generic all or nothing.
+    # Especially if you have more than two nodes.
+    priority: "{{ (inventory_hostname == groups['all'][0]) | ternary('250', '100') }}"
+    # Do not forget to define the VIPs, and their CIDR.
+    vips:
+      - "10.20.30.40/24 dev eth1"
+
+# Whether to add {{ ansible_managed }} information on top of keepalived.conf
+keepalived_show_ansible_managed: true

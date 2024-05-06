@@ -1,0 +1,9 @@
+---
+- name: Install Keepalived
+  hosts: all
+  become: yes
+  roles:
+    - role: keepalived
+
+- name: Install PostgreSQL cluster
+  ansible.builtin.import_playbook: postgresql_cluster/deploy_pgcluster.yml
