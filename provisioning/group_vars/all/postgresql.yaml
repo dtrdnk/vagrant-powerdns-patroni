@@ -1,5 +1,0 @@
----
-is_master: false
-# Cluster variables
-cluster_vip: "10.20.30.40"  # IP address for client access to the databases in the cluster (optional).
-vip_interface: "eth1"  # interface name (e.g., "ens32").

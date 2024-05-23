@@ -1,0 +1,33 @@
+---
+# Ddict containing all configuration options, except for backend
+# configuration and the "config-dir", "setuid" and "setgid" directives.
+pdns_config:
+  allow-axfr-ips: 192.168.121.0/24
+  local-address: 0.0.0.0
+  local-port: 5300
+  cache-ttl: 0
+  negquery-cache-ttl: 10
+  query-cache-ttl: 3
+  xfr-cycle-interval: 60
+  loglevel: 5
+  master: yes
+  api: yes
+  api-key: SshhshhhhKeyHere
+  default-ttl: 1500
+  distributor-threads: 1
+  webserver: yes
+  webserver-address: 0.0.0.0
+  webserver-allow-from: 192.168.121.0/24
+  webserver-password: ssssshhhPassHere
+  webserver-port: 8081
+
+# A dict with all the backends you'd like to configure.
+# This default starts just the bind-backend with an empty config file
+pdns_backends:
+  gpgsql:
+    dbname: pdns
+    host: 192.168.121.99
+    password: sshssshhhPassHerew
+    port: 6432
+    user: pdns
+    dnssec: yes

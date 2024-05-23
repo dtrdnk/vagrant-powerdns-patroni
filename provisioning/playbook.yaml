@@ -1,9 +1,74 @@
 ---
+- name: Workaround for Ubuntu resolv.conf
+  hosts: all
+  become: yes
+  tasks:
+    - name: Add IP address of all hosts in /etc/hosts
+      ansible.builtin.lineinfile:
+        dest: /etc/hosts
+        regexp: '.*{{ item }}$'
+        line: "{{ hostvars[item].ansible_host }} {{ item }}"
+        state: present
+      when: hostvars[item].ansible_host is defined
+      with_items: "{{ groups.all }}"
+
+    - name: Disable service systemd-resolved, and not touch the state
+      ansible.builtin.service:
+        name: systemd-resolved
+        state: stopped
+        enabled: no
+
+    - name: Get symlink info
+      ansible.builtin.stat:
+        path: /etc/resolv.conf
+      register: symlink_stats
+
+    - name: Remove symlink
+      ansible.builtin.file:
+        path: /etc/resolv.conf
+        state: absent
+      when: symlink_stats.stat.islnk | default(false)
+
+    - name: Set DNS nameservers in /etc/resolv.conf
+      ansible.builtin.blockinfile:
+        create: true
+        path: /etc/resolv.conf
+        block: |
+          search home.lab
+          nameserver 1.1.1.1
+          nameserver 8.8.8.8
+
 - name: Install Keepalived
   hosts: all
   become: yes
   roles:
     - role: keepalived
 
+# TODO: add selector for playbook, if first install. Select config_pgcluster.yml patroni cluster already installed
 - name: Install PostgreSQL cluster
   ansible.builtin.import_playbook: postgresql_cluster/deploy_pgcluster.yml
+#  ansible.builtin.import_playbook: postgresql_cluster/config_pgcluster.yml
+
+- name: Install PowerDNS on Master hosts
+  hosts: master
+  become: yes
+  roles:
+    - role: pdns_recursor
+    - role: pdns
+    - role: nginxinc.nginx
+    - role: powerdns-admin
+    - name: nginxinc.nginx_config
+
+- name: Install PowerDNS on Replica hosts
+  hosts: replica
+  become: yes
+  roles:
+    - role: pdns_recursor
+    - role: pdns
+      vars:
+        pdns_create_database: false
+    - role: nginxinc.nginx
+    - role: powerdns-admin
+      vars:
+        pdnsadmin_create_database: false
+    - name: nginxinc.nginx_config

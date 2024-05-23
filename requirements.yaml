@@ -1,12 +1,18 @@
+---
 - name: pdns_recursor
   src: https://github.com/PowerDNS/pdns_recursor-ansible
   version: v1.7.1
-- name: pdns_authoritative
-  src: https://github.com/PowerDNS/pdns-ansible
-  version: v1.8.0
+- name: pdns
+  src: https://github.com/dtrdnk/pdns-ansible
+  version: master
 - name: keepalived
   src: https://github.com/evrardjp/ansible-keepalived
   version: 8.1.0
 - name: postgresql_cluster
   src: https://github.com/dtrdnk/postgresql_cluster
   version: master
+- name: powerdns-admin
+  src: https://github.com/dtrdnk/ansible-role_powerdns-admin
+  version: master
+- name: nginxinc.nginx
+- name: nginxinc.nginx_config

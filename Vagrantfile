@@ -3,13 +3,12 @@
 
 # kube_node and kube_control_plane hosts with ram and cpu properties
 DNS_CLUSTER_HOSTS = [
-  {hostname: "dns-master",     ram: 4096, cpu: 2, ip: "10.20.30.41"},
-  {hostname: "dns-replica-01", ram: 4096, cpu: 2, ip: "10.20.30.42"},
-  {hostname: "dns-replica-02", ram: 4096, cpu: 2, ip: "10.20.30.43"}
+  {hostname: "dns-master",     ram: 4096, cpu: 2},
+  {hostname: "dns-replica-01", ram: 4096, cpu: 2},
+  {hostname: "dns-replica-02", ram: 4096, cpu: 2}
 ]
 
 # Keep empty. This lists for ansible provisioning hosts splitting by their names
-host_vars = {}
 master_hosts = []
 replica_hosts = []
 etcd_cluster_hosts = []
@@ -29,6 +28,19 @@ exit unless REQUIRED_PLUGINS.all? do |plugin|
   )
 end
 
+# This is workaround for imported playbook, which don't see group_vars and host_vars
+make_inventory_dir_script = <<-SCRIPT
+/usr/bin/mkdir -p #{ENV['PWD']}/.vagrant/provisioners/ansible/inventory
+SCRIPT
+
+make_inventory_group_vars_links_script = <<-SCRIPT
+/usr/bin/ln -sf #{ENV['PWD']}/provisioning/group_vars #{ENV['PWD']}/.vagrant/provisioners/ansible/inventory
+SCRIPT
+
+make_inventory_host_vars_links_script = <<-SCRIPT
+/usr/bin/ln -sf #{ENV['PWD']}/provisioning/host_vars #{ENV['PWD']}/.vagrant/provisioners/ansible/inventory
+SCRIPT
+
 Vagrant.configure(2) do |config|
   # Set timezone like in host for each VM
   config.timezone.value = :host
@@ -36,8 +48,7 @@ Vagrant.configure(2) do |config|
   DNS_CLUSTER_HOSTS.each do |node|
     config.vm.define node[:hostname] do |config|
       config.vm.hostname = node[:hostname]
-      config.vm.box = "almalinux/9"
-      config.vm.network :private_network, :ip => node[:ip]
+      config.vm.box = "generic-x64/ubuntu2204"
       config.vm.provider :libvirt do |domain|
         domain.memory = node[:ram]
         domain.cpus = node[:cpu]
@@ -53,11 +64,6 @@ Vagrant.configure(2) do |config|
       # workaround for etcd host
       etcd_cluster_hosts << node[:hostname]
 
-      # Filling host_vars hashmap for ansible. This hashmap necessary for customize VM interface for running PG service
-      host_vars[node[:hostname]] = {
-        "ip": node[:ip]
-      }
-
       # Add workaround for execute provision only on last host
       if node.equal?(DNS_CLUSTER_HOSTS.last)
 
@@ -67,13 +73,30 @@ Vagrant.configure(2) do |config|
           ansible_galaxy_install.ignore = [:destroy, :halt]
         end
 
+        config.trigger.before [:up, :provision] do |make_inventory_dir|
+          make_inventory_dir.info = "Make  inventory links"
+          make_inventory_dir.run = {inline: make_inventory_dir_script }
+          make_inventory_dir.ignore = [:destroy, :halt]
+        end
+
+        config.trigger.before [:up, :provision] do |make_inventory_group_vars_links|
+          make_inventory_group_vars_links.info = "Make  inventory links"
+          make_inventory_group_vars_links.run = {inline: make_inventory_group_vars_links_script }
+          make_inventory_group_vars_links.ignore = [:destroy, :halt]
+        end
+
+        config.trigger.before [:up, :provision] do |make_inventory_host_vars_links|
+          make_inventory_host_vars_links.info = "Make  inventory links"
+          make_inventory_host_vars_links.run = {inline: make_inventory_host_vars_links_script }
+          make_inventory_host_vars_links.ignore = [:destroy, :halt]
+        end
+
         # Execute ansible in provision phase. Workaround for automatically generate provisioning by Vagrant
         config.vm.provision :ansible do |ansible_playbook|
           ansible_playbook.verbose = "v"
           ansible_playbook.compatibility_mode = "2.0"
           ansible_playbook.playbook = "provisioning/playbook.yaml"
           ansible_playbook.host_key_checking = false
-          ansible_playbook.host_vars = host_vars
           ansible_playbook.groups = {
             "master" => master_hosts,
             "etcd_cluster" => etcd_cluster_hosts,

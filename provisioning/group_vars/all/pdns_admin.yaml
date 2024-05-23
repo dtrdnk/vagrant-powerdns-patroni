@@ -1,0 +1,10 @@
+---
+pdnsadmin_group: "nginx"
+pdnsadmin_database:
+  pgsql:
+    name: pdns_admin
+    host: 192.168.121.99
+    password: sshssshhhPassPdnAdmHerew
+    port: 6432
+    user: pdns_admin
+    dnssec: yes

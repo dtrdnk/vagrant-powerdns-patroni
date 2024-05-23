@@ -1,0 +1,26 @@
+---
+# Dict containing all configuration options, except for the
+# "config-dir", "setuid" and "setgid" directives in YAML format.
+pdns_rec_config:
+  allow-from: 192.168.121.0/24 # 0.0.0.0/0, 127.0.0.0/8, 10.0.0.0/8, 169.254.0.0/16, 192.168.0.0/16
+  api-key: sshhApiKeyForRecursorHereShhh
+  local-address: "0.0.0.0" # 0.0.0.0, 127.0.0.1,
+  local-port: 53
+  disable-packetcache: yes
+  max-cache-ttl: 86400
+  max-negative-ttl: 10
+  quiet: no
+  webserver: yes
+  webserver-address: 0.0.0.0
+  webserver-password: recursorWebPassword
+  webserver-port: 8082
+  #dnssec: off
+  # а здесь будем делать всякие интересные вещи, типа контролиовать maintenance режим и беспардонно модифицировать пролетающие запросы и ответы 
+  #lua-dns-script: /etc/powerdns/recursor.lua.d/main.lua
+  lua-maintenance-interval: 5
+  trace: fail
+  loglevel: 5
+  ecs-ipv4-bits: 32
+  use-incoming-edns-subnet: yes
+  forward-zones: home.lab=192.168.121.99:5300
+  forward-zones-recurse: .=8.8.8.8;8.8.4.4

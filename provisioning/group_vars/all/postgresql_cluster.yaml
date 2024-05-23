@@ -1,0 +1,16 @@
+---
+patroni_base_roles:
+  - { job: 'superuser', name: '{{ postgres_own_user }}', password: '{{ postgres_own_password }}' }
+  - { job: 'replication', name: '{{ postgres_repl_user }}', password: '{{ postgres_repl_password }}' }
+  - { job: 'rewind', name: '{{ postgres_rewind_user }}', password: '{{ postgres_rewind_password }}' }
+
+# (optional) list of users to be created (if not already exists)
+postgresql_users:
+  - { name: "{{ pgbouncer_auth_username }}", password: "{{ pgbouncer_auth_password }}", flags: "LOGIN", role: "" }
+  - { name: "pdns", password: "sshssshhhPassHerew", flags: "LOGIN", role: "" }
+  - { name: "pdns_admin", password: "sshssshhhPassPdnAdmHerew", flags: "LOGIN", role: "" }
+
+# (optional) list of databases to be created (if not already exists)
+postgresql_databases:
+  - { db: "pdns", encoding: "UTF8", lc_collate: "en_US.UTF-8", lc_ctype: "en_US.UTF-8", owner: "pdns" }
+  - { db: "pdns_admin", encoding: "UTF8", lc_collate: "en_US.UTF-8", lc_ctype: "en_US.UTF-8", owner: "pdns_admin" }

@@ -1,14 +1,16 @@
 ---
 keepalived_instances:
   internal:
-    interface: "eth1"
+    interface: "eth0"
     # You can also use your own variable to determine which node is master and who
     #state: "{{ (groups['all'].index(inventory_hostname) == 0) | ternary('MASTER','BACKUP') }}"
     state: 'MASTER'
+    track_files:
+      - vrrp_track_file weight -1
     virtual_router_id: 42
     # I advise you to define your own priority per node, instead of a generic all or nothing.
     # Especially if you have more than two nodes.
     priority: "{{ (inventory_hostname == groups['all'][0]) | ternary('250', '100') }}"
     # Do not forget to define the VIPs, and their CIDR.
     vips:
-      - "10.20.30.40/24 dev eth1"
+      - "192.168.121.99/24 dev eth0"
