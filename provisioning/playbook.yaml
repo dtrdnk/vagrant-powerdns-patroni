@@ -44,7 +44,7 @@
   roles:
     - role: keepalived
 
-# TODO: add selector for playbook, if first install. Select config_pgcluster.yml patroni cluster already installed
+# TODO: add selector for playbook, if first install. Select config_pgcluster.yml when patroni cluster already installed
 - name: Install PostgreSQL cluster
   ansible.builtin.import_playbook: postgresql_cluster/deploy_pgcluster.yml
 #  ansible.builtin.import_playbook: postgresql_cluster/config_pgcluster.yml

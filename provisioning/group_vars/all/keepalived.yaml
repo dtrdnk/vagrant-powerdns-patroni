@@ -3,14 +3,11 @@ keepalived_instances:
   internal:
     interface: "eth0"
     # You can also use your own variable to determine which node is master and who
-    #state: "{{ (groups['all'].index(inventory_hostname) == 0) | ternary('MASTER','BACKUP') }}"
     state: 'BACKUP'
-    track_files:
-      - vrrp_track_file weight -1
-    virtual_router_id: 42
-    # I advise you to define your own priority per node, instead of a generic all or nothing.
-    # Especially if you have more than two nodes.
-    priority: "{{ (inventory_hostname == groups['all'][0]) | ternary('250', '100') }}"
+    track_scripts:
+      - patroni_vip_checker
+    virtual_router_id: "1{{ groups['all'].index(inventory_hostname) }}"
+    priority: "100"
     # Do not forget to define the VIPs, and their CIDR.
     vips:
       - "192.168.121.99/24 dev eth0"
@@ -18,9 +15,14 @@ keepalived_instances:
 # Whether to add {{ ansible_managed }} information on top of keepalived.conf
 keepalived_show_ansible_managed: true
 
-keepalived_track_files:
-  vrrp_track_file:
-    file: /etc/keepalived/vrrp_track_file
-    init_file_value: 0
-    weight: -1
-    init_file_overwrite: true
+keepalived_scripts:
+  patroni_vip_checker:
+    fall: 1
+    rise: 1
+    interval: 1
+    src_check_script: "{{ playbook_dir }}/patroni_vip_checker.sh"
+    check_script: "/etc/keepalived/patroni_vip_checker.sh"
+
+keepalived_global_defs:
+  - script_user root
+  - enable_script_security
