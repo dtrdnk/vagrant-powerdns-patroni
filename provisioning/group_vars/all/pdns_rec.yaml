@@ -22,5 +22,5 @@ pdns_rec_config:
   loglevel: 5
   ecs-ipv4-bits: 32
   use-incoming-edns-subnet: yes
-  forward-zones: home.lab=192.168.121.99:5300
-  forward-zones-recurse: .=8.8.8.8;8.8.4.4
+  forward-zones: home.lab=127.0.0.1:5300
+  forward-zones-recurse: .=1.1.1.1;8.8.8.8
