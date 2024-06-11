@@ -14,5 +14,8 @@
 - name: powerdns-admin
   src: https://github.com/dtrdnk/ansible-role_powerdns-admin
   version: master
+- name: powerdns-auth-proxy
+  src: https://github.com/dtrdnk/ansible-role_powerdns-auth-proxy
+  version: master
 - name: nginxinc.nginx
 - name: nginxinc.nginx_config
