@@ -26,7 +26,7 @@ pdns_config:
 pdns_backends:
   gpgsql:
     dbname: pdns
-    host: 192.168.121.99
+    host: "{{ ansible_default_ipv4.address }}"
     password: sshssshhhPassHerew
     port: 6432
     user: pdns

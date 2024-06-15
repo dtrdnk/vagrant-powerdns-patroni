@@ -1,18 +1,24 @@
 ---
 keepalived_instances:
-  internal:
+  patroni:
     interface: "eth0"
-    # You can also use your own variable to determine which node is master and who
     state: 'BACKUP'
     track_scripts:
       - patroni_vip_checker
-    virtual_router_id: "1{{ groups['all'].index(inventory_hostname) }}"
+    virtual_router_id: "11"
     priority: "100"
-    # Do not forget to define the VIPs, and their CIDR.
     vips:
       - "192.168.121.99/24 dev eth0"
+  pdns:
+    interface: "eth0"
+    state: 'BACKUP'
+    track_files:
+      - track_file weight -1
+    virtual_router_id: "22"
+    priority: "100"
+    vips:
+      - "192.168.121.98/24 dev eth0"
 
-# Whether to add {{ ansible_managed }} information on top of keepalived.conf
 keepalived_show_ansible_managed: true
 
 keepalived_scripts:
@@ -26,3 +32,13 @@ keepalived_scripts:
 keepalived_global_defs:
   - script_user root
   - enable_script_security
+
+keepalived_track_files:
+  track_file:
+    # For switching master to another node, run the command:
+    # echo 150 > /etc/keepalived/vrrp_track_file
+    # Switch back master, run the command:
+    # echo 0 > /etc/keepalived/vrrp_track_file
+    file: /etc/keepalived/vrrp_track_file
+    init_file_value: 0
+    init_file_overwrite: true

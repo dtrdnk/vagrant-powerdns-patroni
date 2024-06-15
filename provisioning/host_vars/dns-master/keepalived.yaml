@@ -1,13 +1,20 @@
 ---
 keepalived_instances:
-  internal:
+  patroni:
     interface: "eth0"
-    # You can also use your own variable to determine which node is master and who
     state: 'MASTER'
     track_scripts:
       - patroni_vip_checker
-    virtual_router_id: "1{{ groups['all'].index(inventory_hostname) }}"
+    virtual_router_id: "11"
     priority: "150"
-    # Do not forget to define the VIPs, and their CIDR.
     vips:
       - "192.168.121.99/24 dev eth0"
+  pdns:
+    interface: "eth0"
+    state: 'MASTER'
+    track_files:
+      - track_file weight -1
+    virtual_router_id: "22"
+    priority: "150"
+    vips:
+      - "192.168.121.98/24 dev eth0"
