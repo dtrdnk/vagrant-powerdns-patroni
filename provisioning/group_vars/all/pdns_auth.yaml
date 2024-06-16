@@ -5,16 +5,9 @@ pdns_config:
   allow-axfr-ips: 192.168.121.0/24
   local-address: 127.0.0.1
   local-port: 5300
-  cache-ttl: 0
-  negquery-cache-ttl: 10
-  query-cache-ttl: 3
-  xfr-cycle-interval: 60
-  loglevel: 5
-  master: yes
+  primary: yes
   api: yes
   api-key: SshhshhhhKeyHere
-  default-ttl: 1500
-  distributor-threads: 1
   webserver: yes
   webserver-address: 127.0.0.1
   webserver-allow-from: 127.0.0.0/8
