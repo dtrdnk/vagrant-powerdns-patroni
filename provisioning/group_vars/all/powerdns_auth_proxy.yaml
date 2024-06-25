@@ -4,7 +4,7 @@ powerdns_auth_proxy_api_params:
   api-url: http://127.0.0.1:8081/api/v1/servers/localhost
   override-soa_edit_api: INCEPTION-INCREMENT
   override-nameservers: ns1.home.lab. ns2.home.lab.
-  override-kind: Master
+  override-kind: Native
 
 # This user will be able to create a zone called "demo.home.lab." if it doesn't already exist, and
 # then modify the records in that zone only.

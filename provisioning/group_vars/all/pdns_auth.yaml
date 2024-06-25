@@ -3,9 +3,10 @@
 # configuration and the "config-dir", "setuid" and "setgid" directives.
 pdns_config:
   allow-axfr-ips: 192.168.121.0/24
-  local-address: 127.0.0.1
+  local-address: 0.0.0.0
   local-port: 5300
-  primary: yes
+  primary: no
+  secondary: no
   api: yes
   api-key: SshhshhhhKeyHere
   webserver: yes
